@@ -1,0 +1,9 @@
+---
+# Exercise: Define Ansible Playbook
+- name: Exercise
+  hosts: all
+  user: ubuntu
+  become: true
+  become_method: sudo
+  roles:
+      - setup

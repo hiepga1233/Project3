@@ -17,7 +17,22 @@ jobs:
               --template-file aws/sample3.yml \
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-west-2
-
+  configure_infra:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          # You can get this ID in the section where you registered the SSH Key
+          fingerprints: ["fe:03:2e:e9:ad:41:c4:52:f6:79:50:94:3d:30:7c:d0"]
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            ansible-playbook -i inventory main-remote.yml
 
   say-hello:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
@@ -38,3 +53,6 @@ workflows:
   sample3-workflow:
     jobs:
       - create_infra
+      - configure_infra:
+          requires:
+            - create_infra
