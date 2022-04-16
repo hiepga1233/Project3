@@ -53,6 +53,6 @@ workflows:
   sample3-workflow:
     jobs:
       - create_infra
-      - configure_infra:
-          requires:
-            - create_infra
+ #     - configure_infra:
+  #        requires:
+    #        - create_infra
