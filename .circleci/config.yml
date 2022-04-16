@@ -2,8 +2,15 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+commands:
+    remove_infra:
+        steps:
+            - run:
+                name: Delete Stack
+                command: |
+                  aws cloudformation delete-stack \
+                    -stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
+
 jobs:
   create_infra:
     docker:
@@ -17,6 +24,8 @@ jobs:
               --template-file aws/sample3.yml \
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-west-2
+      - remove_infra:
+          when: on_fail
   configure_infra:
     docker:
       - image: python:3.7-alpine3.11
@@ -33,6 +42,23 @@ jobs:
           name: Run Playbook and Configure server
           command: |
             ansible-playbook -i inventory main-remote.yml
+
+  smock_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apl add --update curl
+      - run:
+          name: Test URL
+          command: | 
+            URL="https://blog.udacity.com/"
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+
 
   say-hello:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
@@ -52,7 +78,7 @@ jobs:
 workflows:
   sample3-workflow:
     jobs:
- #     - create_infra
-      - configure_infra
+      - create_infra
+  #    - configure_infra
   #        requires:
     #        - create_infra
