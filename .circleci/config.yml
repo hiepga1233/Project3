@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Test URL
           command: | 
-            URL="https://blog.udacity.com/"
+            URL="http://35.81.167.189:3000/"
             if curl -s --head ${URL} 
             then
               return 0
@@ -78,6 +78,7 @@ workflows:
   sample3-workflow:
     jobs:
    #   - create_infra
-      - configure_infra
+   #   - configure_infra
+      - smock_test
   #        requires:
     #        - create_infra
