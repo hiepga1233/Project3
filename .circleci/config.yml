@@ -46,7 +46,7 @@ jobs:
     docker:
       - image: alpine:latest
     steps:
-      - run: apl add --update curl
+      - run: apk add --update curl
       - run:
           name: Test URL
           command: | 
